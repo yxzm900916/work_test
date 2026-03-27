@@ -1,0 +1,10 @@
+﻿变量,变量类型,最小期望频数,检验方法,统计量,P值,效应量指标,效应量,结论
+主观复发,二分类,3.11,Fisher's Exact test,0.456,0.2978,Odds Ratio,0.456,不能拒绝H0，无统计学差异
+Ba≥-1,二分类,8.0,Chi-square test,3.8571,0.0495,Cramér's V,0.189,拒绝H0，有统计学差异
+C≥-1,二分类,1.56,Fisher's Exact test,0.35,0.1821,Odds Ratio,0.35,不能拒绝H0，无统计学差异
+Bp≥-1,二分类,1.78,Fisher's Exact test,0.8462,1.0,Odds Ratio,0.8462,不能拒绝H0，无统计学差异
+任一指示点≥-1,二分类,8.89,Chi-square test,6.0013,0.0143,Cramér's V,0.2357,拒绝H0，有统计学差异
+Ba>0,二分类,3.33,Fisher's Exact test,1.1667,1.0,Odds Ratio,1.1667,不能拒绝H0，无统计学差异
+C>0,二分类,1.11,Fisher's Exact test,0.1707,0.0717,Odds Ratio,0.1707,不能拒绝H0，无统计学差异
+Bp>0,二分类,0.22,Fisher's Exact test,0.0,0.2222,Odds Ratio,0.0,不能拒绝H0，无统计学差异
+任一指示点＞0,二分类,4.22,Fisher's Exact test,0.5493,0.3609,Odds Ratio,0.5493,不能拒绝H0，无统计学差异

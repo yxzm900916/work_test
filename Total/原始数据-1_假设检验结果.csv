@@ -1,0 +1,9 @@
+﻿变量,变量类型,检验方法,正态性检验,方差齐性检验,统计量,P值,效应量指标,效应量,结论
+年龄,连续型,Independent t-test,SW(0):p=0.3649; SW(1):p=0.6798,Levene:p=0.1713(equal_var=True),1.2675,0.2077,Cohen's d,0.2934,不能拒绝H0，无统计学差异
+随访时间,连续型,Mann-Whitney U,SW(0):p=0.0079; SW(1):p=0.0000,N/A (non-normal),1176.5,0.1988,Rank-biserial r,-0.1672,不能拒绝H0，无统计学差异
+BMI,连续型,Independent t-test,SW(0):p=0.7832; SW(1):p=0.0577,Levene:p=0.0872(equal_var=True),-1.2509,0.2137,Cohen's d,-0.2895,不能拒绝H0，无统计学差异
+手术时间,连续型,Mann-Whitney U,SW(0):p=0.0010; SW(1):p=0.0001,N/A (non-normal),716.5,0.0315,Rank-biserial r,0.2892,拒绝H0，有统计学差异
+术中出血,连续型,Mann-Whitney U,SW(0):p=0.0000; SW(1):p=0.0000,N/A (non-normal),1058.0,0.7105,Rank-biserial r,-0.0496,不能拒绝H0，无统计学差异
+是否绝经,分类型,Chi-square test,N/A,最小期望频数=9.33,0.7577,0.3841,Cramér's V,0.0838,不能拒绝H0，无统计学差异
+产次,分类型,Chi-square test,N/A,最小期望频数=11.56,0.0007,0.9795,Cramér's V,0.0025,不能拒绝H0，无统计学差异
+术前C,分类型,Chi-square test,N/A,最小期望频数=5.11,0.0,1.0,Cramér's V,0.0,不能拒绝H0，无统计学差异
