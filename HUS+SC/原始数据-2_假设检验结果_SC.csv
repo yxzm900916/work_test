@@ -1,0 +1,10 @@
+﻿变量,变量类型,n(0组),n(1组),检验方法,前提条件检验,统计量,P值,效应量指标,效应量,结论
+主观复发,二分类,4,13,Fisher's Exact test,最小期望频数=0.94,0.9,1.0,Odds Ratio,0.9,不能拒绝H0，无统计学差异
+Ba≥-1,二分类,4,13,Fisher's Exact test,最小期望频数=1.18,0.3,0.5378,Odds Ratio,0.3,不能拒绝H0，无统计学差异
+C≥-1,二分类,4,13,Fisher's Exact test,最小期望频数=0.71,0.5455,1.0,Odds Ratio,0.5455,不能拒绝H0，无统计学差异
+Bp≥-1,二分类,4,13,Fisher's Exact test,含零单元格，直接Fisher精确检验,,1.0,Odds Ratio,,不能拒绝H0，无统计学差异
+任一指示点≥-1,二分类,4,13,Fisher's Exact test,最小期望频数=1.18,0.3,0.5378,Odds Ratio,0.3,不能拒绝H0，无统计学差异
+Ba>0,二分类,4,13,Fisher's Exact test,最小期望频数=1.18,1.3333,1.0,Odds Ratio,1.3333,不能拒绝H0，无统计学差异
+C>0,二分类,4,13,Fisher's Exact test,最小期望频数=0.47,0.25,0.4265,Odds Ratio,0.25,不能拒绝H0，无统计学差异
+Bp>0,二分类,4,13,Fisher's Exact test,含零单元格，直接Fisher精确检验,,1.0,Odds Ratio,,不能拒绝H0，无统计学差异
+任一指示点＞0,二分类,4,13,Fisher's Exact test,最小期望频数=1.41,0.4444,0.584,Odds Ratio,0.4444,不能拒绝H0，无统计学差异

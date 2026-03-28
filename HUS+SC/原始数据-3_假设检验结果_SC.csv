@@ -1,0 +1,12 @@
+﻿变量,变量类型,n(0组),n(1组),检验方法,前提条件检验,统计量,P值,效应量指标,效应量,结论
+性生活疼痛,二分类,4,13,Fisher's Exact test,含零单元格→Fisher,,1.0,Odds Ratio,,不能拒绝H0，无统计学差异
+PGI-I,有序分类,4,13,Mann-Whitney U,有序变量→直接非参数,24.5,0.8878,Rank-biserial r,0.0577,不能拒绝H0，无统计学差异
+差值PISQ-12,连续型,0,4,N/A,有效样本不足,N/A,N/A,N/A,N/A,样本不足，无法检验
+差值POPDI-6,连续型,4,13,Independent t-test,SW(0):p=0.2242; SW(1):p=0.1883; Levene:p=0.5355(equal=True),1.1024,0.2876,Cohen's d,0.6303,不能拒绝H0，无统计学差异
+差值CRADI-8,连续型,4,13,Independent t-test,SW(0):p=0.6474; SW(1):p=0.8460; Levene:p=0.9009(equal=True),-1.0253,0.3215,Cohen's d,-0.5862,不能拒绝H0，无统计学差异
+差值UDI-6,连续型,4,13,Independent t-test,SW(0):p=0.9254; SW(1):p=0.2531; Levene:p=0.8255(equal=True),-0.3854,0.7053,Cohen's d,-0.2204,不能拒绝H0，无统计学差异
+差值PFDI-20,连续型,4,13,Independent t-test,SW(0):p=0.4495; SW(1):p=0.3859; Levene:p=0.6955(equal=True),-0.2732,0.7884,Cohen's d,-0.1562,不能拒绝H0，无统计学差异
+差值UIQ-7,连续型,4,13,Independent t-test,SW(0):p=0.9055; SW(1):p=0.2306; Levene:p=0.4201(equal=True),0.3008,0.7677,Cohen's d,0.172,不能拒绝H0，无统计学差异
+差值CARIQ-7,连续型,4,13,Independent t-test,SW(0):p=0.1230; SW(1):p=0.4722; Levene:p=0.1481(equal=True),0.1518,0.8814,Cohen's d,0.0868,不能拒绝H0，无统计学差异
+差值POPIQ-7,连续型,4,13,Mann-Whitney U,SW(0):p=0.1945; SW(1):p=0.0474,26.5,1.0,Rank-biserial r,-0.0192,不能拒绝H0，无统计学差异
+差值PFIQ-7,连续型,4,13,Independent t-test,SW(0):p=0.6724; SW(1):p=0.7156; Levene:p=0.9105(equal=True),0.1559,0.8782,Cohen's d,0.0891,不能拒绝H0，无统计学差异

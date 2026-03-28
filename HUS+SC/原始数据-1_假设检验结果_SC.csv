@@ -1,0 +1,9 @@
+﻿变量,变量类型,n(0组),n(1组),检验方法,前提条件检验,统计量,P值,效应量指标,效应量,结论
+年龄,连续型,4,13,Independent t-test,SW(0):p=0.5636; SW(1):p=0.2858; Levene:p=0.1962(equal=True),1.0295,0.3196,Cohen's d,0.5886,不能拒绝H0，无统计学差异
+随访时间,连续型,4,13,Independent t-test,SW(0):p=0.2725; SW(1):p=0.0912; Levene:p=0.5204(equal=True),0.4654,0.6484,Cohen's d,0.2661,不能拒绝H0，无统计学差异
+BMI,连续型,4,13,Independent t-test,SW(0):p=0.0979; SW(1):p=0.1729; Levene:p=0.6488(equal=True),-0.8946,0.3851,Cohen's d,-0.5115,不能拒绝H0，无统计学差异
+手术时间,连续型,4,13,Mann-Whitney U,SW(0):p=0.0370; SW(1):p=0.6250,12.5,0.1405,Rank-biserial r,0.5192,不能拒绝H0，无统计学差异
+术中出血,连续型,4,13,Mann-Whitney U,SW(0):p=0.0292; SW(1):p=0.0000,39.0,0.1393,Rank-biserial r,-0.5,不能拒绝H0，无统计学差异
+是否绝经,分类型,4,13,Fisher's Exact test,最小期望频数=1.88,0.0,0.0824,Odds Ratio,0.0,不能拒绝H0，无统计学差异
+产次,分类型,4,13,Fisher's Exact test,最小期望频数=1.88,inf,0.0824,Odds Ratio,inf,不能拒绝H0，无统计学差异
+术前C,分类型,4,13,Fisher's Exact test,最小期望频数=0.47,0.25,0.4265,Odds Ratio,0.25,不能拒绝H0，无统计学差异
