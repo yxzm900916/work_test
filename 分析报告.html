@@ -5,740 +5,334 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>风控分析报告</title>
   <style>
-    :root {
-      --bg: #f5f6fa;
-      --card: #ffffff;
-      --border: #e8ecf2;
-      --text: #1e293b;
-      --text-secondary: #64748b;
-      --accent: #6366f1;
-      --accent-light: rgba(99,102,241,0.08);
-      --green: #10b981;
-      --blue: #3b82f6;
-      --amber: #f59e0b;
-      --red: #ef4444;
-      --purple: #8b5cf6;
-      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
-      --shadow-lg: 0 4px 24px rgba(0,0,0,0.08);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      padding: 40px 20px;
-    }
-    .container { max-width: 1400px; margin: 0 auto; }
-
-    /* === Header === */
-    .header { text-align: center; margin-bottom: 40px; }
-    .header h1 {
-      font-size: 30px; font-weight: 800; color: var(--text);
-      margin-bottom: 12px; letter-spacing: -0.5px;
-    }
-    .header-meta {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--accent-light); border: 1px solid rgba(99,102,241,0.15);
-      border-radius: 20px; padding: 8px 20px; font-size: 13px; color: var(--accent);
-    }
-    .header-meta svg { width: 16px; height: 16px; }
-    .header-desc {
-      margin-top: 16px; font-size: 14px; color: var(--text-secondary);
-      max-width: 760px; margin-left: auto; margin-right: auto; line-height: 1.8;
-    }
-
-    /* === Summary Cards === */
-    .summary-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px; margin-bottom: 40px;
-    }
-    .summary-card {
-      background: var(--card); border-radius: 12px; padding: 20px;
-      box-shadow: var(--shadow); border: 1px solid var(--border);
-      text-align: center; transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .summary-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-    .summary-card .label {
-      font-size: 11px; color: var(--text-secondary);
-      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
-    }
-    .summary-card .value { font-size: 24px; font-weight: 700; color: var(--text); }
-    .summary-card .value.c-accent { color: var(--accent); }
-    .summary-card .value.c-green { color: var(--green); }
-    .summary-card .value.c-red { color: var(--red); }
-    .summary-card .value.c-amber { color: var(--amber); }
-    .summary-card .value.c-blue { color: var(--blue); }
-    .summary-card .sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
-
-    /* === Section === */
-    .section { margin-bottom: 48px; }
-    .section-header {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-      padding-bottom: 12px; border-bottom: 2px solid var(--border);
-    }
-    .section-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 32px; height: 32px; border-radius: 8px;
-      font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
-    }
-    .bg-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .bg-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
-    .bg-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-    .bg-green { background: linear-gradient(135deg, #10b981, #059669); }
-    .bg-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-    .section-title { font-size: 20px; font-weight: 700; color: var(--text); }
-    .section-sub {
-      font-size: 13px; color: var(--text-secondary); margin-left: auto; font-weight: 400;
-    }
-
-    /* === Channel Group === */
-    .channel-group {
-      background: var(--card); border-radius: 16px; box-shadow: var(--shadow);
-      border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden;
-    }
-    .channel-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 24px;
-      background: linear-gradient(135deg, rgba(99,102,241,0.04), rgba(99,102,241,0.01));
-      border-bottom: 1px solid var(--border);
-    }
-    .channel-name { font-size: 14px; font-weight: 600; color: var(--text); }
-    .channel-tag {
-      font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 500;
-    }
-    .tag-self { background: rgba(16,185,129,0.1); color: var(--green); }
-    .tag-mixed { background: rgba(59,130,246,0.1); color: var(--blue); }
-    .tag-commerce { background: rgba(245,158,11,0.1); color: var(--amber); }
-
-    /* === Table === */
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    thead th {
-      background: #f1f5f9; padding: 10px 12px; text-align: right;
-      font-weight: 600; color: var(--text-secondary); font-size: 11px;
-      letter-spacing: 0.3px; white-space: nowrap; border-bottom: 2px solid var(--border);
-    }
-    thead th:first-child { text-align: left; }
-    tbody td {
-      padding: 9px 12px; text-align: right; border-bottom: 1px solid #f1f5f9;
-      white-space: nowrap; font-variant-numeric: tabular-nums;
-    }
-    tbody td:first-child { text-align: left; }
-    tbody tr:hover { background: rgba(99,102,241,0.03); }
-    tbody tr.row-all { background: rgba(99,102,241,0.04); font-weight: 600; }
-    tbody tr.row-all td { border-bottom: 2px solid var(--border); }
-
-    /* Tier Badge */
-    .tier {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 28px; height: 22px; border-radius: 6px;
-      font-size: 12px; font-weight: 700; color: #fff; padding: 0 6px;
-    }
-    .t-all { background: var(--accent); }
-    .t-a { background: var(--green); }
-    .t-b { background: var(--blue); }
-    .t-c { background: var(--amber); }
-    .t-d { background: var(--red); }
-    .t-e { background: var(--purple); }
-
-    .cell-rate { font-weight: 600; }
-    .rate-h { color: var(--red); }
-    .rate-m { color: var(--amber); }
-    .rate-l { color: var(--green); }
-    .cell-err { color: #cbd5e1; font-style: italic; }
-
-    /* === Conclusion Card === */
-    .conclusion {
-      background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(99,102,241,0.02));
-      border: 1px solid rgba(99,102,241,0.15); border-radius: 12px;
-      padding: 20px 24px; margin-bottom: 32px;
-    }
-    .conclusion h3 {
-      font-size: 15px; font-weight: 700; color: var(--accent); margin-bottom: 12px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .conclusion ol { padding-left: 20px; }
-    .conclusion li {
-      font-size: 14px; color: var(--text); line-height: 1.8; margin-bottom: 6px;
-    }
-    .conclusion li strong { color: var(--accent); }
-
-    /* === Detail Table === */
-    .detail-group {
-      background: var(--card); border-radius: 16px; box-shadow: var(--shadow);
-      border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden;
-    }
-    .detail-header {
-      padding: 14px 24px; background: #f8fafc; border-bottom: 1px solid var(--border);
-      font-size: 14px; font-weight: 600; color: var(--text);
-    }
-    .detail-table { font-size: 12px; }
-    .detail-table thead th { font-size: 10px; padding: 8px 10px; }
-    .detail-table tbody td { padding: 7px 10px; font-size: 12px; }
-    .badge-yes {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 24px; height: 20px; border-radius: 4px;
-      font-size: 11px; font-weight: 600; padding: 0 5px;
-    }
-    .badge-self { background: rgba(16,185,129,0.1); color: var(--green); }
-    .badge-partner { background: rgba(245,158,11,0.1); color: var(--amber); }
-    .badge-gap { background: rgba(239,68,68,0.1); color: var(--red); font-weight: 600; }
-
-    /* === Recommendation === */
-    .rec-grid { display: grid; gap: 14px; }
-    .rec-card {
-      background: var(--card); border-radius: 12px; padding: 20px 24px;
-      box-shadow: var(--shadow); border: 1px solid var(--border);
-      border-left: 4px solid var(--accent);
-    }
-    .rec-card .rec-num {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 24px; height: 24px; border-radius: 6px;
-      background: var(--accent); color: #fff; font-size: 12px; font-weight: 700;
-      margin-right: 10px;
-    }
-    .rec-card p {
-      font-size: 14px; color: var(--text); line-height: 1.7; display: inline;
-    }
-
-    /* === Simple Table (for 7-day overdue) === */
-    .simple-table { margin-bottom: 16px; }
-    .simple-table td, .simple-table th { padding: 9px 12px; }
-
-    /* === Divider === */
-    .divider {
-      border: none; border-top: 2px dashed var(--border);
-      margin: 48px 0;
-    }
-
-    /* === Footer === */
-    .footer {
-      text-align: center; padding: 32px 0 0;
-      font-size: 12px; color: var(--text-secondary);
-    }
-
-    @media (max-width: 768px) {
-      body { padding: 20px 12px; }
-      .header h1 { font-size: 22px; }
-      .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .summary-card .value { font-size: 18px; }
-      table { font-size: 12px; }
-      thead th, tbody td { padding: 7px 8px; }
-      .section-sub { display: none; }
-    }
+    :root{--bg:#f5f6fa;--card:#fff;--bd:#e8ecf2;--tx:#1e293b;--ts:#64748b;--ac:#6366f1;--al:rgba(99,102,241,.08);--gn:#10b981;--bl:#3b82f6;--am:#f59e0b;--rd:#ef4444;--pr:#8b5cf6;--sh:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);--sl:0 4px 24px rgba(0,0,0,.08)}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;padding:40px 20px}
+    .c{max-width:1400px;margin:0 auto}
+    .hd{text-align:center;margin-bottom:40px}
+    .hd h1{font-size:30px;font-weight:800;margin-bottom:12px;letter-spacing:-.5px}
+    .hm{display:inline-flex;align-items:center;gap:8px;background:var(--al);border:1px solid rgba(99,102,241,.15);border-radius:20px;padding:8px 20px;font-size:13px;color:var(--ac)}
+    .hm svg{width:16px;height:16px}
+    .hp{margin-top:16px;font-size:14px;color:var(--ts);max-width:760px;margin-left:auto;margin-right:auto;line-height:1.8}
+    .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:40px}
+    .sc{background:var(--card);border-radius:12px;padding:20px;box-shadow:var(--sh);border:1px solid var(--bd);text-align:center;transition:transform .2s,box-shadow .2s}
+    .sc:hover{transform:translateY(-2px);box-shadow:var(--sl)}
+    .sc .lb{font-size:11px;color:var(--ts);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+    .sc .vl{font-size:24px;font-weight:700;color:var(--tx)}
+    .sc .vl.a{color:var(--ac)}.sc .vl.g{color:var(--gn)}.sc .vl.r{color:var(--rd)}.sc .vl.m{color:var(--am)}.sc .vl.b{color:var(--bl)}
+    .sc .su{font-size:12px;color:var(--ts);margin-top:4px}
+    .sn{margin-bottom:48px}
+    .sh{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid var(--bd)}
+    .sb{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+    .ba{background:linear-gradient(135deg,#f59e0b,#d97706)}.br{background:linear-gradient(135deg,#ef4444,#dc2626)}.bb{background:linear-gradient(135deg,#3b82f6,#2563eb)}.bg{background:linear-gradient(135deg,#10b981,#059669)}.bp{background:linear-gradient(135deg,#8b5cf6,#7c3aed)}
+    .st{font-size:20px;font-weight:700}.ss{font-size:13px;color:var(--ts);margin-left:auto;font-weight:400}
+    .cg{background:var(--card);border-radius:16px;box-shadow:var(--sh);border:1px solid var(--bd);margin-bottom:16px;overflow:hidden}
+    .ch{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:linear-gradient(135deg,rgba(99,102,241,.04),rgba(99,102,241,.01));border-bottom:1px solid var(--bd)}
+    .cn{font-size:14px;font-weight:600}
+    .ct{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:500}
+    .cs{background:rgba(16,185,129,.1);color:var(--gn)}.cm{background:rgba(59,130,246,.1);color:var(--bl)}.cc{background:rgba(245,158,11,.1);color:var(--am)}
+    .tw{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    thead th{background:#f1f5f9;padding:10px 12px;text-align:right;font-weight:600;color:var(--ts);font-size:11px;letter-spacing:.3px;white-space:nowrap;border-bottom:2px solid var(--bd)}
+    thead th:first-child{text-align:left}
+    tbody td{padding:9px 12px;text-align:right;border-bottom:1px solid #f1f5f9;white-space:nowrap;font-variant-numeric:tabular-nums}
+    tbody td:first-child{text-align:left}
+    tbody tr:hover{background:rgba(99,102,241,.03)}
+    tbody tr.ra{background:rgba(99,102,241,.04);font-weight:600}
+    tbody tr.ra td{border-bottom:2px solid var(--bd)}
+    .ti{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:22px;border-radius:6px;font-size:12px;font-weight:700;color:#fff;padding:0 6px}
+    .t-all{background:var(--ac)}.t-a{background:var(--gn)}.t-b{background:var(--bl)}.t-c{background:var(--am)}.t-d{background:var(--rd)}.t-e{background:var(--pr)}
+    .cr{font-weight:600}.rh{color:var(--rd)}.rm{color:var(--am)}.rl{color:var(--gn)}.re{color:#cbd5e1;font-style:italic}
+    .co{background:linear-gradient(135deg,rgba(99,102,241,.06),rgba(99,102,241,.02));border:1px solid rgba(99,102,241,.15);border-radius:12px;padding:20px 24px;margin-bottom:32px}
+    .co h3{font-size:15px;font-weight:700;color:var(--ac);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .co ol{padding-left:20px}.co li{font-size:14px;line-height:1.8;margin-bottom:6px}.co li strong{color:var(--ac)}
+    .dg{background:var(--card);border-radius:16px;box-shadow:var(--sh);border:1px solid var(--bd);margin-bottom:16px;overflow:hidden}
+    .dh{padding:14px 24px;background:#f8fafc;border-bottom:1px solid var(--bd);font-size:14px;font-weight:600}
+    .dt{font-size:12px}.dt thead th{font-size:10px;padding:8px 10px}.dt tbody td{padding:7px 10px;font-size:12px}
+    .bi{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:20px;border-radius:4px;font-size:11px;font-weight:600;padding:0 5px}
+    .bi-s{background:rgba(16,185,129,.1);color:var(--gn)}.bi-p{background:rgba(245,158,11,.1);color:var(--am)}.bi-r{background:rgba(239,68,68,.1);color:var(--rd);font-weight:600}
+    .rg{display:grid;gap:14px}
+    .rc{background:var(--card);border-radius:12px;padding:20px 24px;box-shadow:var(--sh);border:1px solid var(--bd);border-left:4px solid var(--ac)}
+    .rc .rn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:var(--ac);color:#fff;font-size:12px;font-weight:700;margin-right:10px}
+    .rc p{font-size:14px;line-height:1.7;display:inline}
+    .dv{border:none;border-top:2px dashed var(--bd);margin:48px 0}
+    .ft{text-align:center;padding:32px 0 0;font-size:12px;color:var(--ts)}
+    @media(max-width:768px){body{padding:20px 12px}.hd h1{font-size:22px}.sg{grid-template-columns:repeat(2,1fr);gap:10px}.sc .vl{font-size:18px}table{font-size:12px}thead th,tbody td{padding:7px 8px}.ss{display:none}}
   </style>
 </head>
 <body>
-<div class="container">
+<div class="c">
 
-  <!-- ====== HEADER ====== -->
-  <div class="header">
+  <div class="hd">
     <h1>风控算法效果分析报告</h1>
-    <div class="header-meta">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      样本期间：0318 – 0415 &nbsp;|&nbsp; 数据截止：0518
-    </div>
-    <p class="header-desc">
-      样本来源为芝麻平台该期间所有订单，要求风控分数非空。<strong>曾经逾期</strong>指只要逾期1天即算逾期；<strong>当前逾期</strong>指截止 0518 仍处于逾期状态。
-    </p>
+    <div class="hm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>样本期间：0318 – 0415 &nbsp;|&nbsp; 数据截止：0518</div>
+    <p class="hp">样本来源为芝麻平台该期间所有订单，要求风控分数非空。<strong>曾经逾期</strong>指只要逾期1天即算逾期；<strong>当前逾期</strong>指截止 0518 仍处于逾期状态。</p>
   </div>
 
-  <!-- ====== SUMMARY ====== -->
-  <div class="summary-grid">
-    <div class="summary-card">
-      <div class="label">总申请数</div>
-      <div class="value c-accent">21,006</div>
-      <div class="sub">3 渠道合计</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">总通过数</div>
-      <div class="value c-green">2,361</div>
-      <div class="sub">整体通过率 11.24%</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">总订单额</div>
-      <div class="value c-blue">1.71 亿</div>
-      <div class="sub">¥171,342,430</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">曾经逾期率</div>
-      <div class="value c-amber">11.70%</div>
-      <div class="sub">曾经逾期 280 笔</div>
-    </div>
-    <div class="summary-card">
-      <div class="label">当前逾期率</div>
-      <div class="value c-red">2.21%</div>
-      <div class="sub">当前逾期 52 笔</div>
-    </div>
+  <div class="sg">
+    <div class="sc"><div class="lb">总申请数</div><div class="vl a">19,296</div><div class="su">3 渠道合计</div></div>
+    <div class="sc"><div class="lb">总通过数</div><div class="vl g">2,149</div><div class="su">整体通过率 11.14%</div></div>
+    <div class="sc"><div class="lb">总订单额</div><div class="vl b">1,592万</div><div class="su">¥15,915,397</div></div>
+    <div class="sc"><div class="lb">曾经逾期率</div><div class="vl m">13.43%</div><div class="su">曾经逾期 289 笔</div></div>
+    <div class="sc"><div class="lb">当前逾期率</div><div class="vl r">2.47%</div><div class="su">当前逾期 52 笔</div></div>
   </div>
 
-  <!-- ====== PART 1：全量分析 ====== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge bg-amber">1</div>
-      <div class="section-title">全量订单 · 曾经逾期分析</div>
-      <span class="section-sub">含所有渠道</span>
-    </div>
+  <!-- 1：全量·曾经逾期 -->
+  <div class="sn"><div class="sh"><div class="sb ba">1</div><div class="st">全量订单 · 曾经逾期分析</div><span class="ss">含所有渠道</span></div>
+    <div class="cg"><div class="ch"><span class="cn">自有风控模型（SELF_BUILT_RISK_MODEL）</span><span class="ct cs">自建模型</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>6,422</td><td>746</td><td>5,451,960</td><td>97</td><td>669,117</td><td class="cr rm">11.62%</td><td class="cr rm">13.00%</td><td>12.27%</td><td>1.1193</td><td>1.0565</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,433</td><td>277</td><td>2,031,062</td><td>29</td><td>194,700</td><td class="cr rl">19.33%</td><td class="cr rm">10.47%</td><td>9.59%</td><td>0.5416</td><td>0.4959</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>2,024</td><td>231</td><td>1,675,860</td><td>34</td><td>254,948</td><td class="cr rm">11.41%</td><td class="cr rh">14.72%</td><td>15.21%</td><td>1.2896</td><td>1.3329</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,685</td><td>191</td><td>1,407,982</td><td>26</td><td>172,621</td><td class="cr rm">11.34%</td><td class="cr rm">13.61%</td><td>12.26%</td><td>1.2009</td><td>1.0816</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>1,060</td><td>47</td><td>337,055</td><td>8</td><td>46,848</td><td class="cr rh">4.43%</td><td class="cr rh">17.02%</td><td>13.90%</td><td>3.8388</td><td>3.1347</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>220</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="cr">0.00%</td><td class="re">—</td><td class="re">—</td><td class="re">—</td><td class="re">—</td></tr>
+    </tbody></table></div></div>
 
-    <!-- SELF_BUILT -->
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">自有风控模型（SELF_BUILT_RISK_MODEL）</span>
-        <span class="channel-tag tag-self">自建模型</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>6,965</td><td>831</td><td>56,600,436</td><td>94</td><td>655,306</td><td class="cell-rate rate-m">11.93%</td><td class="cell-rate rate-m">11.31%</td><td>1.16%</td><td>0.9481</td><td>0.0970</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,551</td><td>295</td><td>12,318,302</td><td>29</td><td>199,149</td><td class="cell-rate rate-l">19.02%</td><td class="cell-rate rate-l">9.83%</td><td>1.62%</td><td>0.5169</td><td>0.0850</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>2,187</td><td>271</td><td>17,491,704</td><td>36</td><td>260,016</td><td class="cell-rate rate-m">12.39%</td><td class="cell-rate rate-m">13.28%</td><td>1.49%</td><td>1.0720</td><td>0.1200</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,826</td><td>211</td><td>14,994,865</td><td>21</td><td>150,102</td><td class="cell-rate rate-m">11.56%</td><td class="cell-rate rate-l">9.95%</td><td>1.00%</td><td>0.8613</td><td>0.0866</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>1,154</td><td>54</td><td>9,380,811</td><td>8</td><td>46,039</td><td class="cell-rate rate-h">4.68%</td><td class="cell-rate rate-h">14.81%</td><td>0.49%</td><td>3.1660</td><td>0.1049</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>247</td><td>0</td><td>2,414,755</td><td>0</td><td>0</td><td class="cell-rate">0.00%</td><td class="cell-err">—</td><td>0.00%</td><td class="cell-err">—</td><td class="cell-err">—</td></tr>
-        </tbody>
-      </table></div>
-    </div>
+    <div class="cg"><div class="ch"><span class="cn">混合策略（MIXED）</span><span class="ct cm">混合</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>6,383</td><td>712</td><td>5,355,731</td><td>111</td><td>834,347</td><td class="cr rm">11.15%</td><td class="cr rh">15.59%</td><td>15.58%</td><td>1.3976</td><td>1.3966</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,403</td><td>223</td><td>1,660,238</td><td>31</td><td>233,871</td><td class="cr rm">15.89%</td><td class="cr rm">13.90%</td><td>14.09%</td><td>0.8746</td><td>0.8863</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>2,109</td><td>247</td><td>1,804,600</td><td>35</td><td>278,210</td><td class="cr rm">11.71%</td><td class="cr rm">14.17%</td><td>15.42%</td><td>1.2099</td><td>1.3163</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,664</td><td>166</td><td>1,266,604</td><td>34</td><td>244,344</td><td class="cr rm">9.98%</td><td class="cr rh">20.48%</td><td>19.29%</td><td>2.0531</td><td>1.9338</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>986</td><td>76</td><td>624,288</td><td>11</td><td>77,923</td><td class="cr rh">7.71%</td><td class="cr rm">14.47%</td><td>12.48%</td><td>1.8778</td><td>1.6194</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>221</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="cr">0.00%</td><td class="re">—</td><td class="re">—</td><td class="re">—</td><td class="re">—</td></tr>
+    </tbody></table></div></div>
 
-    <!-- MIXED -->
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">混合策略（MIXED）</span>
-        <span class="channel-tag tag-mixed">混合</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>6,928</td><td>768</td><td>56,582,836</td><td>106</td><td>800,796</td><td class="cell-rate rate-m">11.09%</td><td class="cell-rate rate-h">13.80%</td><td>1.42%</td><td>1.2451</td><td>0.1277</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,521</td><td>238</td><td>12,125,589</td><td>28</td><td>213,881</td><td class="cell-rate rate-m">15.65%</td><td class="cell-rate rate-m">11.76%</td><td>1.76%</td><td>0.7519</td><td>0.1127</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>2,277</td><td>262</td><td>18,250,497</td><td>34</td><td>272,101</td><td class="cell-rate rate-m">11.51%</td><td class="cell-rate rate-m">12.98%</td><td>1.49%</td><td>1.1278</td><td>0.1296</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,812</td><td>184</td><td>14,991,553</td><td>33</td><td>236,892</td><td class="cell-rate rate-m">10.15%</td><td class="cell-rate rate-h">17.93%</td><td>1.58%</td><td>1.7662</td><td>0.1556</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>1,074</td><td>84</td><td>8,857,486</td><td>11</td><td>77,923</td><td class="cell-rate rate-h">7.82%</td><td class="cell-rate rate-m">13.10%</td><td>0.88%</td><td>1.6743</td><td>0.1125</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>244</td><td>0</td><td>2,357,711</td><td>0</td><td>0</td><td class="cell-rate">0.00%</td><td class="cell-err">—</td><td>0.00%</td><td class="cell-err">—</td><td class="cell-err">—</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-
-    <!-- COMMERCE -->
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）</span>
-        <span class="channel-tag tag-commerce">商用租赁</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>7,113</td><td>762</td><td>58,159,159</td><td>80</td><td>609,196</td><td class="cell-rate rate-m">10.71%</td><td class="cell-rate rate-l">10.50%</td><td>1.05%</td><td>0.9800</td><td>0.0978</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,662</td><td>210</td><td>13,124,382</td><td>19</td><td>139,133</td><td class="cell-rate rate-m">12.64%</td><td class="cell-rate rate-l">9.05%</td><td>1.06%</td><td>0.7161</td><td>0.0839</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>2,272</td><td>252</td><td>18,419,596</td><td>19</td><td>145,814</td><td class="cell-rate rate-m">11.09%</td><td class="cell-rate rate-l">7.54%</td><td>0.79%</td><td>0.6798</td><td>0.0714</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,789</td><td>177</td><td>14,747,305</td><td>22</td><td>174,858</td><td class="cell-rate rate-m">9.89%</td><td class="cell-rate rate-m">12.43%</td><td>1.19%</td><td>1.2563</td><td>0.1198</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>1,134</td><td>107</td><td>9,422,675</td><td>18</td><td>128,947</td><td class="cell-rate rate-m">9.44%</td><td class="cell-rate rate-h">16.82%</td><td>1.37%</td><td>1.7829</td><td>0.1450</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>256</td><td>16</td><td>2,445,200</td><td>2</td><td>20,445</td><td class="cell-rate rate-h">6.25%</td><td class="cell-rate rate-h">12.50%</td><td>0.84%</td><td>2.0000</td><td>0.1338</td></tr>
-        </tbody>
-      </table></div>
-    </div>
+    <div class="cg"><div class="ch"><span class="cn">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）</span><span class="ct cc">商用租赁</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>6,491</td><td>691</td><td>5,107,707</td><td>81</td><td>617,025</td><td class="cr rm">10.65%</td><td class="cr rm">11.72%</td><td>12.08%</td><td>1.1011</td><td>1.1348</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,501</td><td>187</td><td>1,364,170</td><td>21</td><td>149,199</td><td class="cr rm">12.46%</td><td class="cr rm">11.23%</td><td>10.94%</td><td>0.9014</td><td>0.8779</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>2,065</td><td>227</td><td>1,635,717</td><td>19</td><td>148,019</td><td class="cr rm">10.99%</td><td class="cr rl">8.37%</td><td>9.05%</td><td>0.7614</td><td>0.8232</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,640</td><td>164</td><td>1,233,458</td><td>24</td><td>195,978</td><td class="cr rm">10.00%</td><td class="cr rm">14.63%</td><td>15.89%</td><td>1.4634</td><td>1.5889</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>1,052</td><td>99</td><td>746,701</td><td>16</td><td>112,131</td><td class="cr rm">9.41%</td><td class="cr rh">16.16%</td><td>15.02%</td><td>1.7174</td><td>1.5957</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>233</td><td>14</td><td>127,662</td><td>1</td><td>11,698</td><td class="cr rh">6.01%</td><td class="cr rm">7.14%</td><td>9.16%</td><td>1.1888</td><td>1.5250</td></tr>
+    </tbody></table></div></div>
   </div>
 
-  <!-- PART 1.2：当前逾期 -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge bg-red">2</div>
-      <div class="section-title">全量订单 · 当前逾期分析</div>
-      <span class="section-sub">截止 0518</span>
-    </div>
+  <!-- 2：全量·当前逾期 -->
+  <div class="sn"><div class="sh"><div class="sb br">2</div><div class="st">全量订单 · 当前逾期分析</div><span class="ss">截止 0518</span></div>
+    <div class="cg"><div class="ch"><span class="cn">自有风控模型（SELF_BUILT_RISK_MODEL）</span><span class="ct cs">自建模型</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>6,422</td><td>746</td><td>5,451,960</td><td>20</td><td>129,711</td><td class="cr rm">11.62%</td><td class="cr rl">2.68%</td><td>2.38%</td><td>0.2308</td><td>0.2048</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,433</td><td>277</td><td>2,031,062</td><td>3</td><td>25,252</td><td class="cr rl">19.33%</td><td class="cr rl">1.08%</td><td>1.24%</td><td>0.0560</td><td>0.0643</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>2,024</td><td>231</td><td>1,675,860</td><td>12</td><td>78,868</td><td class="cr rm">11.41%</td><td class="cr rh">5.19%</td><td>4.71%</td><td>0.4552</td><td>0.4123</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,685</td><td>191</td><td>1,407,982</td><td>4</td><td>22,964</td><td class="cr rm">11.34%</td><td class="cr rl">2.09%</td><td>1.63%</td><td>0.1848</td><td>0.1439</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>1,060</td><td>47</td><td>337,055</td><td>1</td><td>2,627</td><td class="cr rh">4.43%</td><td class="cr rl">2.13%</td><td>0.78%</td><td>0.4799</td><td>0.1757</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>220</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="cr">0.00%</td><td class="re">—</td><td class="re">—</td><td class="re">—</td><td class="re">—</td></tr>
+    </tbody></table></div></div>
 
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">自有风控模型（SELF_BUILT_RISK_MODEL）</span>
-        <span class="channel-tag tag-self">自建模型</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>6,965</td><td>831</td><td>56,600,436</td><td>20</td><td>129,711</td><td class="cell-rate rate-m">11.93%</td><td class="cell-rate rate-l">2.41%</td><td>0.23%</td><td>0.2017</td><td>0.0192</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,551</td><td>295</td><td>12,318,302</td><td>3</td><td>25,252</td><td class="cell-rate rate-l">19.02%</td><td class="cell-rate rate-l">1.02%</td><td>0.20%</td><td>0.0535</td><td>0.0108</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>2,187</td><td>271</td><td>17,491,704</td><td>12</td><td>78,868</td><td class="cell-rate rate-m">12.39%</td><td class="cell-rate rate-h">4.43%</td><td>0.45%</td><td>0.3573</td><td>0.0364</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,826</td><td>211</td><td>14,994,865</td><td>4</td><td>22,964</td><td class="cell-rate rate-m">11.56%</td><td class="cell-rate rate-l">1.90%</td><td>0.15%</td><td>0.1641</td><td>0.0133</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>1,154</td><td>54</td><td>9,380,811</td><td>1</td><td>2,627</td><td class="cell-rate rate-h">4.68%</td><td class="cell-rate rate-l">1.85%</td><td>0.03%</td><td>0.3957</td><td>0.0060</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>247</td><td>0</td><td>2,414,755</td><td>0</td><td>0</td><td class="cell-rate">0.00%</td><td class="cell-err">—</td><td>0.00%</td><td class="cell-err">—</td><td class="cell-err">—</td></tr>
-        </tbody>
-      </table></div>
-    </div>
+    <div class="cg"><div class="ch"><span class="cn">混合策略（MIXED）</span><span class="ct cm">混合</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>6,383</td><td>712</td><td>5,355,731</td><td>19</td><td>162,052</td><td class="cr rm">11.15%</td><td class="cr rl">2.67%</td><td>3.03%</td><td>0.2392</td><td>0.2713</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,403</td><td>223</td><td>1,660,238</td><td>7</td><td>59,593</td><td class="cr rm">15.89%</td><td class="cr rl">3.14%</td><td>3.59%</td><td>0.1975</td><td>0.2258</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>2,109</td><td>247</td><td>1,804,600</td><td>6</td><td>48,274</td><td class="cr rm">11.71%</td><td class="cr rl">2.43%</td><td>2.68%</td><td>0.2074</td><td>0.2284</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,664</td><td>166</td><td>1,266,604</td><td>6</td><td>54,185</td><td class="cr rm">9.98%</td><td class="cr rl">3.61%</td><td>4.28%</td><td>0.3623</td><td>0.4288</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>986</td><td>76</td><td>624,288</td><td>0</td><td>0</td><td class="cr rh">7.71%</td><td class="cr rl">0.00%</td><td>0.00%</td><td>0.0000</td><td>0.0000</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>221</td><td>0</td><td>0</td><td>0</td><td>0</td><td class="cr">0.00%</td><td class="re">—</td><td class="re">—</td><td class="re">—</td><td class="re">—</td></tr>
+    </tbody></table></div></div>
 
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">混合策略（MIXED）</span>
-        <span class="channel-tag tag-mixed">混合</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>6,928</td><td>768</td><td>56,582,836</td><td>19</td><td>162,052</td><td class="cell-rate rate-m">11.09%</td><td class="cell-rate rate-l">2.47%</td><td>0.29%</td><td>0.2232</td><td>0.0258</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,521</td><td>238</td><td>12,125,589</td><td>7</td><td>59,593</td><td class="cell-rate rate-m">15.65%</td><td class="cell-rate rate-l">2.94%</td><td>0.49%</td><td>0.1880</td><td>0.0314</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>2,277</td><td>262</td><td>18,250,497</td><td>6</td><td>48,274</td><td class="cell-rate rate-m">11.51%</td><td class="cell-rate rate-l">2.29%</td><td>0.26%</td><td>0.1990</td><td>0.0230</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,812</td><td>184</td><td>14,991,553</td><td>6</td><td>54,185</td><td class="cell-rate rate-m">10.15%</td><td class="cell-rate rate-l">3.26%</td><td>0.36%</td><td>0.3211</td><td>0.0356</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>1,074</td><td>84</td><td>8,857,486</td><td>0</td><td>0</td><td class="cell-rate rate-h">7.82%</td><td class="cell-rate rate-l">0.00%</td><td>0.00%</td><td>0.0000</td><td>0.0000</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>244</td><td>0</td><td>2,357,711</td><td>0</td><td>0</td><td class="cell-rate">0.00%</td><td class="cell-err">—</td><td>0.00%</td><td class="cell-err">—</td><td class="cell-err">—</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）</span>
-        <span class="channel-tag tag-commerce">商用租赁</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>7,113</td><td>762</td><td>58,159,159</td><td>13</td><td>112,108</td><td class="cell-rate rate-m">10.71%</td><td class="cell-rate rate-l">1.71%</td><td>0.19%</td><td>0.1593</td><td>0.0180</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,662</td><td>210</td><td>13,124,382</td><td>1</td><td>5,490</td><td class="cell-rate rate-m">12.64%</td><td class="cell-rate rate-l">0.48%</td><td>0.04%</td><td>0.0377</td><td>0.0033</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>2,272</td><td>252</td><td>18,419,596</td><td>5</td><td>36,283</td><td class="cell-rate rate-m">11.09%</td><td class="cell-rate rate-l">1.98%</td><td>0.20%</td><td>0.1789</td><td>0.0178</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,789</td><td>177</td><td>14,747,305</td><td>4</td><td>46,593</td><td class="cell-rate rate-m">9.89%</td><td class="cell-rate rate-l">2.26%</td><td>0.32%</td><td>0.2284</td><td>0.0319</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>1,134</td><td>107</td><td>9,422,675</td><td>3</td><td>23,742</td><td class="cell-rate rate-m">9.44%</td><td class="cell-rate rate-l">2.80%</td><td>0.25%</td><td>0.2971</td><td>0.0267</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>256</td><td>16</td><td>2,445,200</td><td>0</td><td>0</td><td class="cell-rate rate-h">6.25%</td><td class="cell-rate rate-l">0.00%</td><td>0.00%</td><td>0.0000</td><td>0.0000</td></tr>
-        </tbody>
-      </table></div>
-    </div>
+    <div class="cg"><div class="ch"><span class="cn">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）</span><span class="ct cc">商用租赁</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>6,491</td><td>691</td><td>5,107,707</td><td>13</td><td>112,108</td><td class="cr rm">10.65%</td><td class="cr rl">1.88%</td><td>2.19%</td><td>0.1767</td><td>0.2062</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,501</td><td>187</td><td>1,364,170</td><td>1</td><td>5,490</td><td class="cr rm">12.46%</td><td class="cr rl">0.53%</td><td>0.40%</td><td>0.0429</td><td>0.0323</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>2,065</td><td>227</td><td>1,635,717</td><td>5</td><td>36,283</td><td class="cr rm">10.99%</td><td class="cr rl">2.20%</td><td>2.22%</td><td>0.2004</td><td>0.2018</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,640</td><td>164</td><td>1,233,458</td><td>4</td><td>46,593</td><td class="cr rm">10.00%</td><td class="cr rl">2.44%</td><td>3.78%</td><td>0.2439</td><td>0.3777</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>1,052</td><td>99</td><td>746,701</td><td>3</td><td>23,742</td><td class="cr rm">9.41%</td><td class="cr rl">3.03%</td><td>3.18%</td><td>0.3220</td><td>0.3379</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>233</td><td>14</td><td>127,662</td><td>0</td><td>0</td><td class="cr rh">6.01%</td><td class="cr rl">0.00%</td><td>0.00%</td><td>0.0000</td><td>0.0000</td></tr>
+    </tbody></table></div></div>
   </div>
 
   <!-- 全量结论 -->
-  <div class="conclusion">
-    <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>全量分析结论</h3>
-    <ol>
-      <li>在曾经逾期维度上，自有算法组虽然曾经逾期率和曾经逾期金额率都略微偏大，但是通过率也略微偏大。在局部范围内，逾期率和通过率可以近似成正比，因此对比<strong>曾经逾期率/通过率</strong>和<strong>曾经逾期金额/通过率</strong>两个指标，可以发现自有算法组较好。</li>
-      <li>在当前逾期维度，自有算法组不如租赁分组，主要原因是最近4天报回偏多。但是从曾经逾期率和当前逾期率对比来看，用户即使逾期，后续还款率也不低，因此需要结合逾期天数来看。</li>
-      <li>是否自营上面存在一些差异，不过样本太少结果不显著。之前建模没有考虑非自营样本，可能会有偏差。</li>
-    </ol>
+  <div class="co"><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>全量分析结论</h3><ol>
+    <li>在曾经逾期维度上，自有算法组虽然曾经逾期率和曾经逾期金额率都略微偏大，但是通过率也略微偏大。在局部范围内，逾期率和通过率可以近似成正比，因此对比<strong>曾经逾期率/通过率</strong>和<strong>曾经逾期金额/通过率</strong>两个指标，可以发现自有算法组较好。</li>
+    <li>在当前逾期维度，自有算法组不如租赁分组，主要原因是最近4天报回偏多，但<strong>当前逾期金额/通过率</strong>自有算法组已经偏优。但是从曾经逾期率和当前逾期率对比来看，用户及时逾期，后续还款率也不低，因此需要结合逾期天数来看。</li>
+    <li>是否自营上面存在一些差异，不过样本太少结果不显著。之前建模没有考虑非自营样本，可能会有偏差。</li>
+  </ol></div>
+
+  <hr class="dv">
+
+  <!-- 附：当前逾期明细 -->
+  <div class="sn"><div class="sh"><div class="sb br">附</div><div class="st">当前逾期明细</div><span class="ss">截止 0518</span></div>
+    <div class="dg"><div class="dh">自有风控模型（SELF_BUILT_RISK_MODEL）· 20 笔</div><div class="tw"><table class="dt"><thead><tr><th>订单号</th><th>创建时间</th><th>预计还款时间</th><th>是否自营</th></tr></thead><tbody>
+      <tr><td>O202604142043944130004475904</td><td>4/14 14:47</td><td>5/17</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604142044025668922601472</td><td>4/14 20:11</td><td>5/17</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604142044074340054036480</td><td>4/14 23:24</td><td>5/17</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604132043508650414788608</td><td>4/13 09:56</td><td>5/16</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604122043176925973270528</td><td>4/12 11:58</td><td>5/15</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604122043330350300090368</td><td>4/12 22:08</td><td>5/15</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604102042290865739223040</td><td>4/10 01:17</td><td>5/13</td><td><span class="bi bi-p">非自营</span></td></tr>
+      <tr><td>O202604102042418475077038080</td><td>4/10 09:44</td><td>5/13</td><td><span class="bi bi-p">非自营</span></td></tr>
+      <tr><td>O202604102042512031212986368</td><td>4/10 15:56</td><td>5/13</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604092042269752795680768</td><td>4/9 23:53</td><td>5/12</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604082041679359158865920</td><td>4/8 08:47</td><td>5/11</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604082041905905865940992</td><td>4/8 23:47</td><td>5/11</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604072041489317568278528</td><td>4/7 20:12</td><td>5/10</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604062040931437244928000</td><td>4/6 07:15</td><td>5/9</td><td><span class="bi bi-p">非自营</span></td></tr>
+      <tr><td>O202604032039882266672979968</td><td>4/3 09:46</td><td>5/6</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604022039378309005533184</td><td>4/2 00:24</td><td>5/5</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202603312038837832166494208</td><td>3/31 12:36</td><td>5/3</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202603232035952124397318144</td><td>3/23 13:29</td><td>4/26</td><td><span class="bi bi-p">非自营</span></td></tr>
+      <tr><td>O202603232035847446024122368</td><td>3/23 06:33</td><td>4/26</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202603212035176288668844032</td><td>3/21 10:06</td><td>4/24</td><td><span class="bi bi-p">非自营</span></td></tr>
+    </tbody></table></div></div>
+
+    <div class="dg"><div class="dh">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）· 13 笔</div><div class="tw"><table class="dt"><thead><tr><th>订单号</th><th>创建时间</th><th>预计还款时间</th><th>是否自营</th></tr></thead><tbody>
+      <tr><td>O202604142043894742737575936</td><td>4/14 11:30</td><td>5/17</td><td><span class="bi bi-p">非自营</span></td></tr>
+      <tr><td>O202604132043587705021493248</td><td>4/13 15:10</td><td>5/16</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604122043207394358022144</td><td>4/12 13:59</td><td>5/15</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604122043126162748170240</td><td>4/12 08:36</td><td>5/15</td><td><span class="bi bi-p">非自营</span></td></tr>
+      <tr><td>O202604112042833697273110528</td><td>4/11 13:14</td><td>5/14</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604102042507917162799104</td><td>4/10 15:40</td><td>5/13</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604082041744963224039424</td><td>4/8 13:08</td><td>5/11</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604082041654780973637632</td><td>4/8 07:10</td><td>5/11</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604052040652658295533568</td><td>4/5 12:48</td><td>5/8</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202604032039907710696779776</td><td>4/3 11:27</td><td>5/6</td><td><span class="bi bi-p">非自营</span></td></tr>
+      <tr><td>O202604022039591725896916992</td><td>4/2 14:32</td><td>5/5</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202603272037410465158090752</td><td>3/27 14:04</td><td>4/30</td><td><span class="bi bi-s">自营</span></td></tr>
+      <tr><td>O202603242036450900711055360</td><td>3/24 22:31</td><td>4/27</td><td><span class="bi bi-s">自营</span></td></tr>
+    </tbody></table></div></div>
   </div>
 
-  <hr class="divider">
+  <hr class="dv">
 
-  <!-- ====== PART 2：当前逾期明细 ====== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge bg-red">附</div>
-      <div class="section-title">当前逾期明细</div>
-      <span class="section-sub">截止 0518 共 52 笔</span>
-    </div>
+  <!-- 3：仅自营·曾经逾期 -->
+  <div class="sn"><div class="sh"><div class="sb bb">3</div><div class="st">仅自营业务 · 曾经逾期分析</div><span class="ss">排除非自营干扰</span></div>
+    <div class="cg"><div class="ch"><span class="cn">自有风控模型（SELF_BUILT_RISK_MODEL）</span><span class="ct cs">自建模型</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>5,617</td><td>641</td><td>4,725,270</td><td>82</td><td>567,896</td><td class="cr rm">11.41%</td><td class="cr rh">12.79%</td><td>12.02%</td><td>1.1210</td><td>1.0531</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,260</td><td>238</td><td>1,769,974</td><td>27</td><td>180,404</td><td class="cr rl">18.89%</td><td class="cr rm">11.34%</td><td>10.19%</td><td>0.6006</td><td>0.5396</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>1,749</td><td>194</td><td>1,413,334</td><td>28</td><td>202,991</td><td class="cr rm">11.09%</td><td class="cr rh">14.43%</td><td>14.36%</td><td>1.3012</td><td>1.2949</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,458</td><td>164</td><td>1,220,755</td><td>20</td><td>140,503</td><td class="cr rm">11.25%</td><td class="cr rm">12.20%</td><td>11.51%</td><td>1.0842</td><td>1.0232</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>930</td><td>45</td><td>321,207</td><td>7</td><td>43,997</td><td class="cr rh">4.84%</td><td class="cr rh">15.56%</td><td>13.70%</td><td>3.2148</td><td>2.8308</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>220</td><td>0</td><td>—</td><td>0</td><td>0</td><td class="cr">0.00%</td><td class="re">—</td><td class="re">—</td><td class="re">—</td><td class="re">—</td></tr>
+    </tbody></table></div></div>
 
-    <div class="detail-group">
-      <div class="detail-header">自有风控模型（SELF_BUILT_RISK_MODEL）· 20 笔</div>
-      <div class="table-wrap"><table class="detail-table">
-        <thead><tr><th>订单号</th><th>创建时间</th><th>预计还款时间</th><th>是否自营</th></tr></thead>
-        <tbody>
-          <tr><td>O202604142043944130004475904</td><td>2026/4/14 14:47</td><td>2026/5/17</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604142044025668922601472</td><td>2026/4/14 20:11</td><td>2026/5/17</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604142044074340054036480</td><td>2026/4/14 23:24</td><td>2026/5/17</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604132043508650414788608</td><td>2026/4/13 09:56</td><td>2026/5/16</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604122043176925973270528</td><td>2026/4/12 11:58</td><td>2026/5/15</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604122043330350300090368</td><td>2026/4/12 22:08</td><td>2026/5/15</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604102042290865739223040</td><td>2026/4/10 01:17</td><td>2026/5/13</td><td><span class="badge-yes badge-partner">非自营</span></td></tr>
-          <tr><td>O202604102042418475077038080</td><td>2026/4/10 09:44</td><td>2026/5/13</td><td><span class="badge-yes badge-partner">非自营</span></td></tr>
-          <tr><td>O202604102042512031212986368</td><td>2026/4/10 15:56</td><td>2026/5/13</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604092042269752795680768</td><td>2026/4/9 23:53</td><td>2026/5/12</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604082041679359158865920</td><td>2026/4/8 08:47</td><td>2026/5/11</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604082041905905865940992</td><td>2026/4/8 23:47</td><td>2026/5/11</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604072041489317568278528</td><td>2026/4/7 20:12</td><td>2026/5/10</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604062040931437244928000</td><td>2026/4/6 07:15</td><td>2026/5/9</td><td><span class="badge-yes badge-partner">非自营</span></td></tr>
-          <tr><td>O202604032039882266672979968</td><td>2026/4/3 09:46</td><td>2026/5/6</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604022039378309005533184</td><td>2026/4/2 00:24</td><td>2026/5/5</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202603312038837832166494208</td><td>2026/3/31 12:36</td><td>2026/5/3</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202603232035952124397318144</td><td>2026/3/23 13:29</td><td>2026/4/26</td><td><span class="badge-yes badge-partner">非自营</span></td></tr>
-          <tr><td>O202603232035847446024122368</td><td>2026/3/23 06:33</td><td>2026/4/26</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202603212035176288668844032</td><td>2026/3/21 10:06</td><td>2026/4/24</td><td><span class="badge-yes badge-partner">非自营</span></td></tr>
-        </tbody>
-      </table></div>
-    </div>
-
-    <div class="detail-group">
-      <div class="detail-header">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）· 13 笔</div>
-      <div class="table-wrap"><table class="detail-table">
-        <thead><tr><th>订单号</th><th>创建时间</th><th>预计还款时间</th><th>是否自营</th></tr></thead>
-        <tbody>
-          <tr><td>O202604142043894742737575936</td><td>2026/4/14 11:30</td><td>2026/5/17</td><td><span class="badge-yes badge-partner">非自营</span></td></tr>
-          <tr><td>O202604132043587705021493248</td><td>2026/4/13 15:10</td><td>2026/5/16</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604122043207394358022144</td><td>2026/4/12 13:59</td><td>2026/5/15</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604122043126162748170240</td><td>2026/4/12 08:36</td><td>2026/5/15</td><td><span class="badge-yes badge-partner">非自营</span></td></tr>
-          <tr><td>O202604112042833697273110528</td><td>2026/4/11 13:14</td><td>2026/5/14</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604102042507917162799104</td><td>2026/4/10 15:40</td><td>2026/5/13</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604082041744963224039424</td><td>2026/4/8 13:08</td><td>2026/5/11</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604082041654780973637632</td><td>2026/4/8 07:10</td><td>2026/5/11</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604052040652658295533568</td><td>2026/4/5 12:48</td><td>2026/5/8</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202604032039907710696779776</td><td>2026/4/3 11:27</td><td>2026/5/6</td><td><span class="badge-yes badge-partner">非自营</span></td></tr>
-          <tr><td>O202604022039591725896916992</td><td>2026/4/2 14:32</td><td>2026/5/5</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202603272037410465158090752</td><td>2026/3/27 14:04</td><td>2026/4/30</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-          <tr><td>O202603242036450900711055360</td><td>2026/3/24 22:31</td><td>2026/4/27</td><td><span class="badge-yes badge-self">自营</span></td></tr>
-        </tbody>
-      </table></div>
-    </div>
+    <div class="cg"><div class="ch"><span class="cn">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）</span><span class="ct cc">商用租赁</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>5,827</td><td>598</td><td>4,412,695</td><td>71</td><td>536,507</td><td class="cr rm">10.26%</td><td class="cr rm">11.87%</td><td>12.16%</td><td>1.1569</td><td>1.1847</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,343</td><td>166</td><td>1,203,420</td><td>18</td><td>126,135</td><td class="cr rm">12.36%</td><td class="cr rm">10.84%</td><td>10.48%</td><td>0.8773</td><td>0.8480</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>1,861</td><td>193</td><td>1,404,862</td><td>17</td><td>133,729</td><td class="cr rm">10.37%</td><td class="cr rl">8.81%</td><td>9.52%</td><td>0.8493</td><td>0.9179</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,485</td><td>144</td><td>1,060,486</td><td>20</td><td>159,563</td><td class="cr rm">9.70%</td><td class="cr rm">13.89%</td><td>15.05%</td><td>1.4323</td><td>1.5516</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>923</td><td>82</td><td>623,763</td><td>15</td><td>105,383</td><td class="cr rm">8.88%</td><td class="cr rh">18.29%</td><td>16.89%</td><td>2.0590</td><td>1.9017</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>215</td><td>13</td><td>120,164</td><td>1</td><td>11,698</td><td class="cr rh">6.05%</td><td class="cr rm">7.69%</td><td>9.73%</td><td>1.2722</td><td>1.6100</td></tr>
+    </tbody></table></div></div>
   </div>
 
-  <hr class="divider">
+  <!-- 4：仅自营·当前逾期 -->
+  <div class="sn"><div class="sh"><div class="sb bb">4</div><div class="st">仅自营业务 · 当前逾期分析</div></div>
+    <div class="cg"><div class="ch"><span class="cn">自有风控模型（SELF_BUILT_RISK_MODEL）</span><span class="ct cs">自建模型</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>5,617</td><td>641</td><td>4,725,270</td><td>15</td><td>100,858</td><td class="cr rm">11.41%</td><td class="cr rl">2.34%</td><td>2.13%</td><td>0.2051</td><td>0.1870</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,260</td><td>238</td><td>1,769,974</td><td>2</td><td>17,455</td><td class="cr rl">18.89%</td><td class="cr rl">0.84%</td><td>0.99%</td><td>0.0445</td><td>0.0522</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>1,749</td><td>194</td><td>1,413,334</td><td>9</td><td>59,617</td><td class="cr rm">11.09%</td><td class="cr rh">4.64%</td><td>4.22%</td><td>0.4182</td><td>0.3803</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,458</td><td>164</td><td>1,220,755</td><td>3</td><td>21,160</td><td class="cr rm">11.25%</td><td class="cr rl">1.83%</td><td>1.73%</td><td>0.1626</td><td>0.1541</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>930</td><td>45</td><td>321,207</td><td>1</td><td>2,627</td><td class="cr rh">4.84%</td><td class="cr rl">2.22%</td><td>0.82%</td><td>0.4593</td><td>0.1690</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>220</td><td>0</td><td>—</td><td>0</td><td>0</td><td class="cr">0.00%</td><td class="re">—</td><td class="re">—</td><td class="re">—</td><td class="re">—</td></tr>
+    </tbody></table></div></div>
 
-  <!-- ====== PART 3：仅自营 ====== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge bg-blue">3</div>
-      <div class="section-title">仅自营业务 · 曾经逾期分析</div>
-      <span class="section-sub">排除非自营干扰</span>
-    </div>
-
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">自有风控模型（SELF_BUILT_RISK_MODEL）</span>
-        <span class="channel-tag tag-self">自建模型</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>5,617</td><td>641</td><td>4,725,270</td><td>82</td><td>567,896</td><td class="cell-rate rate-m">11.41%</td><td class="cell-rate rate-h">12.79%</td><td>12.02%</td><td>1.1210</td><td>1.0531</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,260</td><td>238</td><td>1,769,974</td><td>27</td><td>180,404</td><td class="cell-rate rate-l">18.89%</td><td class="cell-rate rate-m">11.34%</td><td>10.19%</td><td>0.6006</td><td>0.5396</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>1,749</td><td>194</td><td>1,413,334</td><td>28</td><td>202,991</td><td class="cell-rate rate-m">11.09%</td><td class="cell-rate rate-h">14.43%</td><td>14.36%</td><td>1.3012</td><td>1.2949</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,458</td><td>164</td><td>1,220,755</td><td>20</td><td>140,503</td><td class="cell-rate rate-m">11.25%</td><td class="cell-rate rate-m">12.20%</td><td>11.51%</td><td>1.0842</td><td>1.0232</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>930</td><td>45</td><td>321,207</td><td>7</td><td>43,997</td><td class="cell-rate rate-h">4.84%</td><td class="cell-rate rate-h">15.56%</td><td>13.70%</td><td>3.2148</td><td>2.8308</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>220</td><td>0</td><td>—</td><td>0</td><td>0</td><td class="cell-rate">0.00%</td><td class="cell-err">—</td><td class="cell-err">—</td><td class="cell-err">—</td><td class="cell-err">—</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）</span>
-        <span class="channel-tag tag-commerce">商用租赁</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>曾经逾期数</th><th>曾经逾期订单额</th><th>通过率</th><th>曾经逾期率</th><th>曾经逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>5,827</td><td>598</td><td>4,412,695</td><td>71</td><td>536,507</td><td class="cell-rate rate-m">10.26%</td><td class="cell-rate rate-m">11.87%</td><td>12.16%</td><td>1.1569</td><td>1.1847</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,343</td><td>166</td><td>1,203,420</td><td>18</td><td>126,135</td><td class="cell-rate rate-m">12.36%</td><td class="cell-rate rate-m">10.84%</td><td>10.48%</td><td>0.8773</td><td>0.8480</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>1,861</td><td>193</td><td>1,404,862</td><td>17</td><td>133,729</td><td class="cell-rate rate-m">10.37%</td><td class="cell-rate rate-l">8.81%</td><td>9.52%</td><td>0.8493</td><td>0.9179</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,485</td><td>144</td><td>1,060,486</td><td>20</td><td>159,563</td><td class="cell-rate rate-m">9.70%</td><td class="cell-rate rate-h">13.89%</td><td>15.05%</td><td>1.4323</td><td>1.5516</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>923</td><td>82</td><td>623,763</td><td>15</td><td>105,383</td><td class="cell-rate rate-m">8.88%</td><td class="cell-rate rate-h">18.29%</td><td>16.89%</td><td>2.0590</td><td>1.9017</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>215</td><td>13</td><td>120,164</td><td>1</td><td>11,698</td><td class="cell-rate rate-h">6.05%</td><td class="cell-rate rate-m">7.69%</td><td>9.73%</td><td>1.2722</td><td>1.6100</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-  </div>
-
-  <!-- 仅自营 · 当前逾期 -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge bg-blue">4</div>
-      <div class="section-title">仅自营业务 · 当前逾期分析</div>
-    </div>
-
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">自有风控模型（SELF_BUILT_RISK_MODEL）</span>
-        <span class="channel-tag tag-self">自建模型</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>5,617</td><td>641</td><td>4,725,270</td><td>15</td><td>100,858</td><td class="cell-rate rate-m">11.41%</td><td class="cell-rate rate-l">2.34%</td><td>2.13%</td><td>0.2051</td><td>0.1870</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,260</td><td>238</td><td>1,769,974</td><td>2</td><td>17,455</td><td class="cell-rate rate-l">18.89%</td><td class="cell-rate rate-l">0.84%</td><td>0.99%</td><td>0.0445</td><td>0.0522</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>1,749</td><td>194</td><td>1,413,334</td><td>9</td><td>59,617</td><td class="cell-rate rate-m">11.09%</td><td class="cell-rate rate-h">4.64%</td><td>4.22%</td><td>0.4182</td><td>0.3803</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,458</td><td>164</td><td>1,220,755</td><td>3</td><td>21,160</td><td class="cell-rate rate-m">11.25%</td><td class="cell-rate rate-l">1.83%</td><td>1.73%</td><td>0.1626</td><td>0.1541</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>930</td><td>45</td><td>321,207</td><td>1</td><td>2,627</td><td class="cell-rate rate-h">4.84%</td><td class="cell-rate rate-l">2.22%</td><td>0.82%</td><td>0.4593</td><td>0.1690</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>220</td><td>0</td><td>—</td><td>0</td><td>0</td><td class="cell-rate">0.00%</td><td class="cell-err">—</td><td class="cell-err">—</td><td class="cell-err">—</td><td class="cell-err">—</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）</span>
-        <span class="channel-tag tag-commerce">商用租赁</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>5,827</td><td>598</td><td>4,412,695</td><td>10</td><td>84,820</td><td class="cell-rate rate-m">10.26%</td><td class="cell-rate rate-l">1.67%</td><td>1.92%</td><td>0.1629</td><td>0.1873</td></tr>
-          <tr><td><span class="tier t-a">A</span></td><td>1,343</td><td>166</td><td>1,203,420</td><td>1</td><td>5,490</td><td class="cell-rate rate-m">12.36%</td><td class="cell-rate rate-l">0.60%</td><td>0.46%</td><td>0.0487</td><td>0.0369</td></tr>
-          <tr><td><span class="tier t-b">B</span></td><td>1,861</td><td>193</td><td>1,404,862</td><td>3</td><td>21,993</td><td class="cell-rate rate-m">10.37%</td><td class="cell-rate rate-l">1.55%</td><td>1.57%</td><td>0.1499</td><td>0.1510</td></tr>
-          <tr><td><span class="tier t-c">C</span></td><td>1,485</td><td>144</td><td>1,060,486</td><td>3</td><td>33,595</td><td class="cell-rate rate-m">9.70%</td><td class="cell-rate rate-l">2.08%</td><td>3.17%</td><td>0.2148</td><td>0.3267</td></tr>
-          <tr><td><span class="tier t-d">D</span></td><td>923</td><td>82</td><td>623,763</td><td>3</td><td>23,742</td><td class="cell-rate rate-m">8.88%</td><td class="cell-rate rate-m">3.66%</td><td>3.81%</td><td>0.4118</td><td>0.4284</td></tr>
-          <tr><td><span class="tier t-e">E</span></td><td>215</td><td>13</td><td>120,164</td><td>0</td><td>0</td><td class="cell-rate rate-h">6.05%</td><td class="cell-rate rate-l">0.00%</td><td>0.00%</td><td>0.0000</td><td>0.0000</td></tr>
-        </tbody>
-      </table></div>
-    </div>
+    <div class="cg"><div class="ch"><span class="cn">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）</span><span class="ct cc">商用租赁</span></div><div class="tw"><table><thead><tr><th>分层</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th><th>逾期率/通过率</th><th>逾期金额/通过率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>5,827</td><td>598</td><td>4,412,695</td><td>10</td><td>84,820</td><td class="cr rm">10.26%</td><td class="cr rl">1.67%</td><td>1.92%</td><td>0.1629</td><td>0.1873</td></tr>
+      <tr><td><span class="ti t-a">A</span></td><td>1,343</td><td>166</td><td>1,203,420</td><td>1</td><td>5,490</td><td class="cr rm">12.36%</td><td class="cr rl">0.60%</td><td>0.46%</td><td>0.0487</td><td>0.0369</td></tr>
+      <tr><td><span class="ti t-b">B</span></td><td>1,861</td><td>193</td><td>1,404,862</td><td>3</td><td>21,993</td><td class="cr rm">10.37%</td><td class="cr rl">1.55%</td><td>1.57%</td><td>0.1499</td><td>0.1510</td></tr>
+      <tr><td><span class="ti t-c">C</span></td><td>1,485</td><td>144</td><td>1,060,486</td><td>3</td><td>33,595</td><td class="cr rm">9.70%</td><td class="cr rl">2.08%</td><td>3.17%</td><td>0.2148</td><td>0.3267</td></tr>
+      <tr><td><span class="ti t-d">D</span></td><td>923</td><td>82</td><td>623,763</td><td>3</td><td>23,742</td><td class="cr rm">8.88%</td><td class="cr rm">3.66%</td><td>3.81%</td><td>0.4118</td><td>0.4284</td></tr>
+      <tr><td><span class="ti t-e">E</span></td><td>215</td><td>13</td><td>120,164</td><td>0</td><td>0</td><td class="cr rh">6.05%</td><td class="cr rl">0.00%</td><td>0.00%</td><td>0.0000</td><td>0.0000</td></tr>
+    </tbody></table></div></div>
   </div>
 
   <!-- 仅自营结论 -->
-  <div class="conclusion">
-    <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>仅自营分析结论</h3>
-    <ol>
-      <li>如果只看自营订单，在曾经逾期维度上，曾经逾期率两组已经接近，自有算法组的<strong>曾经逾期金额率已经优于租赁分组</strong>。在当前逾期维度上，自有算法组仍然效果偏差，但是<strong>当前逾期金额/通过率已经反超</strong>。主要还是最近新增报回需要观察的问题。</li>
-      <li>为什么自有算法组的逾期金额率会偏好，主要原因是<strong>好用户的通过率高，放款金额大</strong>。
-        <ul style="margin-top:6px;padding-left:18px;">
-          <li>从逾期率来看，自有算法不同分层上的逾期率是逐渐增加的，且两个分组在 A 层级上的逾期率是接近的，说明增加了租赁分的逻辑并没有显著增益，即可以认为 <strong>A 层级的用户为好用户</strong>。</li>
-          <li>在我们的通过用户中，自有算法组 A 层级用户占比达到 <strong>37%</strong>，而租赁分组只有 <strong>26%</strong>，说明租赁分组的优质资产比例不高，从而在逾期金额率角度来看，自有算法组会更好。</li>
-        </ul>
-      </li>
-    </ol>
-  </div>
+  <div class="co"><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>仅自营分析结论</h3><ol>
+    <li>如果只看自营订单，在曾经逾期维度上，可以看到曾经逾期率两组已经接近，自有算法组的<strong>曾经逾期金额率已经优于租赁分组</strong>。在当前逾期维度上，自有算法组仍然效果偏差，但是<strong>当前逾期金额/通过率已经反超</strong>。主要还是最近新增报回需要观察的问题。</li>
+    <li>为什么自有算法组的逾期金额率会偏好，主要原因是<strong>好用户的通过率高，放款金额大</strong>。<ul style="margin-top:6px;padding-left:18px;"><li>从逾期率来看，自有算法不同分层上的逾期率是逐渐增加的，且两个分组在 A 层级上的逾期率是接近的，说明增加了租赁分的逻辑并没有显著增益，即可以认为 <strong>A 层级的用户为好用户</strong>。</li><li>在我们的通过用户中，自有算法组 A 层级用户占比达到 <strong>37%</strong>，而租赁分组只有 <strong>26%</strong>，说明租赁分组的优质资产比例不高，从而在逾期金额率角度来看，自有算法组会更好。</li></ul></li>
+  </ol></div>
 
-  <hr class="divider">
+  <hr class="dv">
 
-  <!-- ====== PART 4：到期7天逾期率 ====== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge bg-green">5</div>
-      <div class="section-title">到期 7 天后逾期率分析</div>
-      <span class="section-sub">样本 0318 – 0410，逾期 7 天及以上</span>
-    </div>
+  <!-- 5：到期7天逾期率 -->
+  <div class="sn"><div class="sh"><div class="sb bg">5</div><div class="st">到期 7 天后逾期率分析</div><span class="ss">样本 0318–0410，逾期 ≥7 天</span></div>
+    <div class="cg"><div class="ch"><span class="cn">两组对比（到期 7 天逾期率）</span></div><div class="tw"><table><thead><tr><th>分层</th><th>策略渠道</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th></tr></thead><tbody>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>SELF_BUILT_RISK_MODEL</td><td>4,565</td><td>518</td><td>3,767,888</td><td>13</td><td>80,338</td><td class="cr rl">11.35%</td><td class="cr rl">2.51%</td><td class="cr rl">2.13%</td></tr>
+      <tr class="ra"><td><span class="ti t-all">ALL</span></td><td>COMMERCE_RENT_RISK_CONSULT</td><td>4,780</td><td>473</td><td>3,419,311</td><td>11</td><td>82,592</td><td class="cr rh">9.90%</td><td class="cr rm">2.33%</td><td class="cr rh">2.42%</td></tr>
+    </tbody></table></div></div>
 
-    <div class="channel-group">
-      <div class="channel-header">
-        <span class="channel-name">两组对比（到期 7 天逾期率）</span>
-      </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>分层</th><th>策略渠道</th><th>申请数</th><th>通过数</th><th>总订单额</th><th>当前逾期数</th><th>当前逾期订单额</th><th>通过率</th><th>当前逾期率</th><th>当前逾期金额率</th></tr></thead>
-        <tbody>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>SELF_BUILT_RISK_MODEL</td><td>4,565</td><td>518</td><td>3,767,888</td><td>12</td><td>75,530</td><td class="cell-rate rate-l">11.35%</td><td class="cell-rate rate-l">2.32%</td><td class="cell-rate rate-l">2.00%</td></tr>
-          <tr class="row-all"><td><span class="tier t-all">ALL</span></td><td>COMMERCE_RENT_RISK_CONSULT</td><td>4,780</td><td>473</td><td>3,419,311</td><td>11</td><td>82,592</td><td class="cell-rate rate-h">9.90%</td><td class="cell-rate rate-m">2.33%</td><td class="cell-rate rate-h">2.42%</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-
-    <div class="conclusion">
-      <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>到期 7 天逾期率结论</h3>
-      <ol>
-        <li>在到期 7 天后的逾期率这个指标上来看，<strong>自有算法有更好的表现</strong>，更高的通过率以及更低的逾期金额率。原因就是算法预测的是逾期 30 天的概率，所以表现期越长，效果越好。</li>
-        <li>样本还是太少，不足以有特别显著的表现。</li>
-      </ol>
-    </div>
+    <div class="co"><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>到期 7 天逾期率结论</h3><ol>
+      <li>在到期 7 天后的逾期率这个指标上来看，<strong>自有算法有更好的表现</strong>，更高的通过率以及更低的逾期金额率。原因就是算法预测的是逾期 30 天的概率，所以表现期越长，效果越好。</li>
+      <li>样本还是太少，不足以有特别显著的表现。</li>
+    </ol></div>
   </div>
 
   <!-- 7天逾期明细 -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge bg-green">附</div>
-      <div class="section-title">0318–0410 逾期 7 天及以上样本明细</div>
-    </div>
+  <div class="sn"><div class="sh"><div class="sb bg">附</div><div class="st">0318–0410 逾期 ≥7 天样本明细</div></div>
+    <div class="dg"><div class="dh">自有风控模型（SELF_BUILT_RISK_MODEL）· 13 笔</div><div class="tw"><table class="dt"><thead><tr><th>订单号</th><th>创建时间</th><th>预计还款</th><th>是否自营</th><th>逾期天数</th><th>订单金额</th></tr></thead><tbody>
+      <tr><td>O202604072041489317...</td><td>4/7 20:12</td><td>5/10</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>7,230</td></tr>
+      <tr><td>O202604032039882266...</td><td>4/3 09:46</td><td>5/6</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>8,582</td></tr>
+      <tr><td>O202604022039378309...</td><td>4/2 00:24</td><td>5/5</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>6,601</td></tr>
+      <tr><td>O202603312038837832...</td><td>3/31 12:36</td><td>5/3</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>4,256</td></tr>
+      <tr><td>O202604092042269752...</td><td>4/9 23:53</td><td>5/12</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>2,627</td></tr>
+      <tr><td>O202604102042512031...</td><td>4/10 15:56</td><td>5/13</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>7,498</td></tr>
+      <tr><td>O202603202034776708...</td><td>3/20 07:39</td><td>4/23</td><td><span class="bi bi-s">自营</span></td><td><span class="bi bi-r">8天</span></td><td>4,256</td></tr>
+      <tr><td>O202604082041679359...</td><td>4/8 08:47</td><td>5/11</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>8,707</td></tr>
+      <tr><td>O202603232035847446...</td><td>3/23 06:33</td><td>4/26</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>5,865</td></tr>
+      <tr><td>O202603202034701867...</td><td>3/20 02:41</td><td>4/23</td><td><span class="bi bi-s">自营</span></td><td><span class="bi bi-r">7天</span></td><td>6,539</td></tr>
+      <tr><td>O202604012039202599...</td><td>4/1 12:46</td><td>5/4</td><td><span class="bi bi-s">自营</span></td><td><span class="bi bi-r">11天</span></td><td>4,808</td></tr>
+      <tr><td>O202604082041905905...</td><td>4/8 23:47</td><td>5/11</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>6,748</td></tr>
+      <tr><td>O202603242036355746...</td><td>3/24 16:13</td><td>4/27</td><td><span class="bi bi-s">自营</span></td><td><span class="bi bi-r">9天</span></td><td>6,623</td></tr>
+    </tbody></table></div></div>
 
-    <div class="detail-group">
-      <div class="detail-header">自有风控模型（SELF_BUILT_RISK_MODEL）· 12 笔</div>
-      <div class="table-wrap"><table class="detail-table">
-        <thead><tr><th>订单号</th><th>创建时间</th><th>预计还款时间</th><th>是否自营</th><th>逾期天数</th></tr></thead>
-        <tbody>
-          <tr><td>O202604102042512031212986368</td><td>2026/4/10 15:56</td><td>2026/5/13</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202604092042269752795680768</td><td>2026/4/9 23:53</td><td>2026/5/12</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202604082041679359158865920</td><td>2026/4/8 08:47</td><td>2026/5/11</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202604082041905905865940992</td><td>2026/4/8 23:47</td><td>2026/5/11</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202604072041489317568278528</td><td>2026/4/7 20:12</td><td>2026/5/10</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202604032039882266672979968</td><td>2026/4/3 09:46</td><td>2026/5/6</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202604022039378309005533184</td><td>2026/4/2 00:24</td><td>2026/5/5</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202603312038837832166494208</td><td>2026/3/31 12:36</td><td>2026/5/3</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202603232035847446024122368</td><td>2026/3/23 06:33</td><td>2026/4/26</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202603242036355746859859968</td><td>2026/3/24 16:13</td><td>2026/4/27</td><td><span class="badge-yes badge-self">自营</span></td><td><span class="badge-gap">9天</span></td></tr>
-          <tr><td>O202603202034776708252925952</td><td>2026/3/20 07:39</td><td>2026/4/23</td><td><span class="badge-yes badge-self">自营</span></td><td><span class="badge-gap">8天</span></td></tr>
-          <tr><td>O202603202034701867281776640</td><td>2026/3/20 02:41</td><td>2026/4/23</td><td><span class="badge-yes badge-self">自营</span></td><td><span class="badge-gap">7天</span></td></tr>
-        </tbody>
-      </table></div>
-    </div>
+    <div class="dg"><div class="dh">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）· 11 笔</div><div class="tw"><table class="dt"><thead><tr><th>订单号</th><th>创建时间</th><th>预计还款</th><th>是否自营</th><th>逾期天数</th><th>订单金额</th></tr></thead><tbody>
+      <tr><td>O202604052040652658...</td><td>4/5 12:48</td><td>5/8</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>7,498</td></tr>
+      <tr><td>O202604102042507917...</td><td>4/10 15:40</td><td>5/13</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>6,998</td></tr>
+      <tr><td>O202603242036450900...</td><td>3/24 22:31</td><td>4/27</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>14,189</td></tr>
+      <tr><td>O202604082041654780...</td><td>4/8 07:10</td><td>5/11</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>11,609</td></tr>
+      <tr><td>O202603292038250785...</td><td>3/29 21:43</td><td>5/1</td><td><span class="bi bi-s">自营</span></td><td><span class="bi bi-r">7天</span></td><td>6,368</td></tr>
+      <tr><td>O202604062041081799...</td><td>4/6 17:13</td><td>5/9</td><td><span class="bi bi-s">自营</span></td><td><span class="bi bi-r">9天</span></td><td>7,872</td></tr>
+      <tr><td>O202603272037410465...</td><td>3/27 14:04</td><td>4/30</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>5,490</td></tr>
+      <tr><td>O202603262037027551...</td><td>3/26 12:43</td><td>4/29</td><td><span class="bi bi-s">自营</span></td><td><span class="bi bi-r">8天</span></td><td>3,248</td></tr>
+      <tr><td>O202603232035949759...</td><td>3/23 13:20</td><td>4/26</td><td><span class="bi bi-s">自营</span></td><td><span class="bi bi-r">10天</span></td><td>4,326</td></tr>
+      <tr><td>O202604082041744963...</td><td>4/8 13:08</td><td>5/11</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>7,498</td></tr>
+      <tr><td>O202604022039591725...</td><td>4/2 14:32</td><td>5/5</td><td><span class="bi bi-s">自营</span></td><td>—</td><td>7,498</td></tr>
+    </tbody></table></div></div>
+  </div>
 
-    <div class="detail-group">
-      <div class="detail-header">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）· 11 笔</div>
-      <div class="table-wrap"><table class="detail-table">
-        <thead><tr><th>订单号</th><th>创建时间</th><th>预计还款时间</th><th>是否自营</th><th>逾期天数</th></tr></thead>
-        <tbody>
-          <tr><td>O202604062041081799473983488</td><td>2026/4/6 17:13</td><td>2026/5/9</td><td><span class="badge-yes badge-self">自营</span></td><td><span class="badge-gap">9天</span></td></tr>
-          <tr><td>O202604102042507917162799104</td><td>2026/4/10 15:40</td><td>2026/5/13</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202604082041744963224039424</td><td>2026/4/8 13:08</td><td>2026/5/11</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202604082041654780973637632</td><td>2026/4/8 07:10</td><td>2026/5/11</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202603292038250785475219456</td><td>2026/3/29 21:43</td><td>2026/5/1</td><td><span class="badge-yes badge-self">自营</span></td><td><span class="badge-gap">7天</span></td></tr>
-          <tr><td>O202604052040652658295533568</td><td>2026/4/5 12:48</td><td>2026/5/8</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202604022039591725896916992</td><td>2026/4/2 14:32</td><td>2026/5/5</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202603262037027551257829376</td><td>2026/3/26 12:43</td><td>2026/4/29</td><td><span class="badge-yes badge-self">自营</span></td><td><span class="badge-gap">8天</span></td></tr>
-          <tr><td>O202603272037410465158090752</td><td>2026/3/27 14:04</td><td>2026/4/30</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202603242036450900711055360</td><td>2026/3/24 22:31</td><td>2026/4/27</td><td><span class="badge-yes badge-self">自营</span></td><td>—</td></tr>
-          <tr><td>O202603232035949759338344448</td><td>2026/3/23 13:20</td><td>2026/4/26</td><td><span class="badge-yes badge-self">自营</span></td><td><span class="badge-gap">10天</span></td></tr>
-        </tbody>
-      </table></div>
+  <hr class="dv">
+
+  <!-- 6：T10 逾期分析 -->
+  <div class="sn"><div class="sh"><div class="sb bp">6</div><div class="st">T10 逾期订单分析</div><span class="ss">0318–0415 期间 T10 逾期明细</span></div>
+    <div class="dg"><div class="dh">T10 逾期订单明细 · 20 笔</div><div class="tw"><table class="dt"><thead><tr><th>订单号</th><th>创建时间</th><th>策略渠道</th><th>预计还款</th><th>逾期天数</th><th>自有算法分层</th></tr></thead><tbody>
+      <tr><td>O202604082041713360...</td><td>4/8 11:02</td><td><span class="ct cs">自建模型</span></td><td>5/11</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-a">A</span></td></tr>
+      <tr><td>O202604012039241160...</td><td>4/1 15:19</td><td><span class="ct cs">自建模型</span></td><td>5/4</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-a">A</span></td></tr>
+      <tr><td>O202603312038829879...</td><td>3/31 12:04</td><td><span class="ct cs">自建模型</span></td><td>5/3</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-a">A</span></td></tr>
+      <tr><td>O202603262036987093...</td><td>3/26 10:02</td><td><span class="ct cs">自建模型</span></td><td>4/29</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-a">A</span></td></tr>
+      <tr><td>O202603192034563885...</td><td>3/19 17:33</td><td><span class="ct cs">自建模型</span></td><td>4/22</td><td><span class="bi bi-r">2天</span></td><td><span class="ti t-a">A</span></td></tr>
+      <tr><td>O202604132043508650...</td><td>4/13 09:56</td><td><span class="ct cs">自建模型</span></td><td>5/16</td><td>—</td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202604072041489317...</td><td>4/7 20:12</td><td><span class="ct cs">自建模型</span></td><td>5/10</td><td>—</td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202604032039882266...</td><td>4/3 09:46</td><td><span class="ct cs">自建模型</span></td><td>5/6</td><td>—</td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202604022039378309...</td><td>4/2 00:24</td><td><span class="ct cs">自建模型</span></td><td>5/5</td><td>—</td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202604082041788671...</td><td>4/8 16:02</td><td><span class="ct cs">自建模型</span></td><td>5/11</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202603312038837832...</td><td>3/31 12:36</td><td><span class="ct cs">自建模型</span></td><td>5/3</td><td>—</td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202604062041126793...</td><td>4/6 20:12</td><td><span class="ct cs">自建模型</span></td><td>5/9</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202604012039166577...</td><td>4/1 10:22</td><td><span class="ct cs">自建模型</span></td><td>5/4</td><td><span class="bi bi-r">2天</span></td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202603272037391467...</td><td>3/27 12:49</td><td><span class="ct cs">自建模型</span></td><td>4/30</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202604032040015641...</td><td>4/3 18:36</td><td><span class="ct cc">商用租赁</span></td><td>5/6</td><td><span class="bi bi-r">3天</span></td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202604102042507917...</td><td>4/10 15:40</td><td><span class="ct cc">商用租赁</span></td><td>5/13</td><td>—</td><td><span class="ti t-b">B</span></td></tr>
+      <tr><td>O202604092042040998...</td><td>4/9 08:44</td><td><span class="ct cs">自建模型</span></td><td>5/12</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-c">C</span></td></tr>
+      <tr><td>O202603272037464524...</td><td>3/27 17:39</td><td><span class="ct cs">自建模型</span></td><td>4/30</td><td><span class="bi bi-r">6天</span></td><td><span class="ti t-c">C</span></td></tr>
+      <tr><td>O202603252036772403...</td><td>3/25 19:49</td><td><span class="ct cs">自建模型</span></td><td>4/28</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-c">C</span></td></tr>
+      <tr><td>O202603222035715697...</td><td>3/22 21:50</td><td><span class="ct cs">自建模型</span></td><td>4/25</td><td><span class="bi bi-r">1天</span></td><td><span class="ti t-c">C</span></td></tr>
+      <tr><td>O202604092042269752...</td><td>4/9 23:53</td><td><span class="ct cs">自建模型</span></td><td>5/12</td><td>—</td><td><span class="ti t-d">D</span></td></tr>
+    </tbody></table></div></div>
+
+    <div class="co"><h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>T10 分析结论</h3><ol>
+      <li>T10 风险相对其他层级是<strong>偏高的</strong>。</li>
+      <li>但是 T10 其实逾期后的偿还率不差，可能和芝麻的定义有关系。芝麻 T10 可能是只要逾期就算的黑名单之类的逻辑。</li>
+      <li>目前风险偏高，其实也就是 4.2–4.8 评级为 B 的 4 笔订单，但是<strong>样本较少，不具有统计意义</strong>。</li>
+    </ol></div>
+  </div>
+
+  <hr class="dv">
+
+  <!-- 后续建议 -->
+  <div class="sn"><div class="sh"><div class="sb bp">★</div><div class="st">后续建议</div></div>
+    <div class="rg">
+      <div class="rc"><span class="rn">1</span><p>样本太少，看不到滚动表现，仅一个月的样本表现波动较大。如果要等逾期率表现出来，需要较长时间。</p></div>
+      <div class="rc"><span class="rn">2</span><p>由于表现期很长，算法更加关注在第 6 期上的逾期率，所以等待周期很长，实验停止后又需要重新累计数据。</p></div>
+      <div class="rc"><span class="rn">3</span><p>剔除 MIX 人群，剔除非自营渠道，剩下流量进行自有算法和租赁分的 <strong>1:1 测试</strong>。</p></div>
     </div>
   </div>
 
-  <hr class="divider">
-
-  <!-- ====== PART 5：T10 逾期分析 ====== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge bg-purple">6</div>
-      <div class="section-title">T10 逾期订单分析</div>
-      <span class="section-sub">0318–0415 期间 T10 逾期明细</span>
-    </div>
-
-    <div class="detail-group">
-      <div class="detail-header">T10 逾期订单明细 · 20 笔</div>
-      <div class="table-wrap"><table class="detail-table">
-        <thead><tr><th>订单号</th><th>创建时间</th><th>策略渠道</th><th>预计还款时间</th><th>逾期天数</th><th>自有算法分层</th></tr></thead>
-        <tbody>
-          <tr><td>O202604082041713360623980544</td><td>2026/4/8 11:02</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/11</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-a">A</span></td></tr>
-          <tr><td>O202604012039241160012689408</td><td>2026/4/1 15:19</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/4</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-a">A</span></td></tr>
-          <tr><td>O202603312038829879430569984</td><td>2026/3/31 12:04</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/3</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-a">A</span></td></tr>
-          <tr><td>O202603262036987093035003904</td><td>2026/3/26 10:02</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/29</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-a">A</span></td></tr>
-          <tr><td>O202603192034563885853798400</td><td>2026/3/19 17:33</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/22</td><td><span class="badge-gap">2天</span></td><td><span class="tier t-a">A</span></td></tr>
-          <tr><td>O202604132043508650414788608</td><td>2026/4/13 09:56</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/16</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202604072041489317568278528</td><td>2026/4/7 20:12</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/10</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202604032039882266672979968</td><td>2026/4/3 09:46</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/6</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202604022039378309005533184</td><td>2026/4/2 00:24</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/5</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202604082041788671512375296</td><td>2026/4/8 16:02</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/11</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202603312038837832166494208</td><td>2026/3/31 12:36</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/3</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202604062041126793408761856</td><td>2026/4/6 20:12</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/9</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202604012039166577163202560</td><td>2026/4/1 10:22</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/4</td><td><span class="badge-gap">2天</span></td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202603272037391467351724032</td><td>2026/3/27 12:49</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/30</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202604032040015641865965568</td><td>2026/4/3 18:36</td><td><span class="channel-tag tag-commerce">商用租赁</span></td><td>2026/5/6</td><td><span class="badge-gap">3天</span></td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202604102042507917162799104</td><td>2026/4/10 15:40</td><td><span class="channel-tag tag-commerce">商用租赁</span></td><td>2026/5/13</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
-          <tr><td>O202604092042040998215380992</td><td>2026/4/9 08:44</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/12</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-c">C</span></td></tr>
-          <tr><td>O202603272037464524950949888</td><td>2026/3/27 17:39</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/30</td><td><span class="badge-gap">6天</span></td><td><span class="tier t-c">C</span></td></tr>
-          <tr><td>O202603252036772403533070336</td><td>2026/3/25 19:49</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/28</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-c">C</span></td></tr>
-          <tr><td>O202603222035715697428365312</td><td>2026/3/22 21:50</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/25</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-c">C</span></td></tr>
-          <tr><td>O202604092042269752795680768</td><td>2026/4/9 23:53</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/12</td><td>—</td><td><span class="tier t-d">D</span></td></tr>
-        </tbody>
-      </table></div>
-    </div>
-
-    <div class="conclusion">
-      <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>T10 分析结论</h3>
-      <ol>
-        <li>T10 风险相对其他层级是<strong>偏高的</strong>。</li>
-        <li>但是 T10 其实逾期后的偿还率不差，可能和芝麻的定义有关系。芝麻 T10 可能是只要逾期就算的黑名单之类的逻辑。</li>
-        <li>目前风险偏高，其实也就是 4.2–4.8 评级为 B 的 4 笔订单，但是<strong>样本较少，不具有统计意义</strong>。</li>
-      </ol>
-    </div>
-  </div>
-
-  <hr class="divider">
-
-  <!-- ====== PART 6：后续建议 ====== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-badge bg-purple">★</div>
-      <div class="section-title">后续建议</div>
-    </div>
-
-    <div class="rec-grid">
-      <div class="rec-card">
-        <span class="rec-num">1</span>
-        <p>样本太少，看不到滚动表现，仅一个月的样本表现波动较大。如果要等逾期率表现出来，需要较长时间。</p>
-      </div>
-      <div class="rec-card">
-        <span class="rec-num">2</span>
-        <p>由于表现期很长，算法更加关注在第 6 期上的逾期率，所以等待周期很长，实验停止后又需要重新累计数据。</p>
-      </div>
-      <div class="rec-card">
-        <span class="rec-num">3</span>
-        <p>剔除 MIX 人群，剔除非自营渠道，剩下流量进行自有算法和租赁分的 <strong>1:1 测试</strong>。</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer">
-    数据来源：芝麻平台 &nbsp;·&nbsp; 样本期间 0318–0415 &nbsp;·&nbsp; 统计截止 0518
-  </div>
-
+  <div class="ft">数据来源：芝麻平台 &nbsp;·&nbsp; 样本期间 0318–0415 &nbsp;·&nbsp; 统计截止 0518</div>
 </div>
 </body>
 </html>
