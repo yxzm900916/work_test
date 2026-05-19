@@ -407,7 +407,7 @@
     <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>全量分析结论</h3>
     <ol>
       <li>在曾经逾期维度上，自有算法组虽然曾经逾期率和曾经逾期金额率都略微偏大，但是通过率也略微偏大。在局部范围内，逾期率和通过率可以近似成正比，因此对比<strong>曾经逾期率/通过率</strong>和<strong>曾经逾期金额/通过率</strong>两个指标，可以发现自有算法组较好。</li>
-      <li>在当前逾期维度，自有算法组不如租赁分组，主要原因是最近4天报回偏多。但是从曾经逾期率和当前逾期率对比来看，用户及时逾期，后续还款率也不低，因此需要结合逾期天数来看。</li>
+      <li>在当前逾期维度，自有算法组不如租赁分组，主要原因是最近4天报回偏多。但是从曾经逾期率和当前逾期率对比来看，用户即使逾期，后续还款率也不低，因此需要结合逾期天数来看。</li>
       <li>是否自营上面存在一些差异，不过样本太少结果不显著。之前建模没有考虑非自营样本，可能会有偏差。</li>
     </ol>
   </div>
@@ -640,7 +640,7 @@
     </div>
 
     <div class="detail-group">
-      <div class="detail-header">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）· 12 笔</div>
+      <div class="detail-header">商用租赁风控咨询（COMMERCE_RENT_RISK_CONSULT）· 11 笔</div>
       <div class="table-wrap"><table class="detail-table">
         <thead><tr><th>订单号</th><th>创建时间</th><th>预计还款时间</th><th>是否自营</th><th>逾期天数</th></tr></thead>
         <tbody>
@@ -662,7 +662,57 @@
 
   <hr class="divider">
 
-  <!-- ====== PART 5：后续建议 ====== -->
+  <!-- ====== PART 5：T10 逾期分析 ====== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge bg-purple">6</div>
+      <div class="section-title">T10 逾期订单分析</div>
+      <span class="section-sub">0318–0415 期间 T10 逾期明细</span>
+    </div>
+
+    <div class="detail-group">
+      <div class="detail-header">T10 逾期订单明细 · 20 笔</div>
+      <div class="table-wrap"><table class="detail-table">
+        <thead><tr><th>订单号</th><th>创建时间</th><th>策略渠道</th><th>预计还款时间</th><th>逾期天数</th><th>自有算法分层</th></tr></thead>
+        <tbody>
+          <tr><td>O202604082041713360623980544</td><td>2026/4/8 11:02</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/11</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-a">A</span></td></tr>
+          <tr><td>O202604012039241160012689408</td><td>2026/4/1 15:19</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/4</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-a">A</span></td></tr>
+          <tr><td>O202603312038829879430569984</td><td>2026/3/31 12:04</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/3</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-a">A</span></td></tr>
+          <tr><td>O202603262036987093035003904</td><td>2026/3/26 10:02</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/29</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-a">A</span></td></tr>
+          <tr><td>O202603192034563885853798400</td><td>2026/3/19 17:33</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/22</td><td><span class="badge-gap">2天</span></td><td><span class="tier t-a">A</span></td></tr>
+          <tr><td>O202604132043508650414788608</td><td>2026/4/13 09:56</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/16</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202604072041489317568278528</td><td>2026/4/7 20:12</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/10</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202604032039882266672979968</td><td>2026/4/3 09:46</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/6</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202604022039378309005533184</td><td>2026/4/2 00:24</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/5</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202604082041788671512375296</td><td>2026/4/8 16:02</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/11</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202603312038837832166494208</td><td>2026/3/31 12:36</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/3</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202604062041126793408761856</td><td>2026/4/6 20:12</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/9</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202604012039166577163202560</td><td>2026/4/1 10:22</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/4</td><td><span class="badge-gap">2天</span></td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202603272037391467351724032</td><td>2026/3/27 12:49</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/30</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202604032040015641865965568</td><td>2026/4/3 18:36</td><td><span class="channel-tag tag-commerce">商用租赁</span></td><td>2026/5/6</td><td><span class="badge-gap">3天</span></td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202604102042507917162799104</td><td>2026/4/10 15:40</td><td><span class="channel-tag tag-commerce">商用租赁</span></td><td>2026/5/13</td><td>—</td><td><span class="tier t-b">B</span></td></tr>
+          <tr><td>O202604092042040998215380992</td><td>2026/4/9 08:44</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/12</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-c">C</span></td></tr>
+          <tr><td>O202603272037464524950949888</td><td>2026/3/27 17:39</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/30</td><td><span class="badge-gap">6天</span></td><td><span class="tier t-c">C</span></td></tr>
+          <tr><td>O202603252036772403533070336</td><td>2026/3/25 19:49</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/28</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-c">C</span></td></tr>
+          <tr><td>O202603222035715697428365312</td><td>2026/3/22 21:50</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/4/25</td><td><span class="badge-gap">1天</span></td><td><span class="tier t-c">C</span></td></tr>
+          <tr><td>O202604092042269752795680768</td><td>2026/4/9 23:53</td><td><span class="channel-tag tag-self">自建模型</span></td><td>2026/5/12</td><td>—</td><td><span class="tier t-d">D</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="conclusion">
+      <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>T10 分析结论</h3>
+      <ol>
+        <li>T10 风险相对其他层级是<strong>偏高的</strong>。</li>
+        <li>但是 T10 其实逾期后的偿还率不差，可能和芝麻的定义有关系。芝麻 T10 可能是只要逾期就算的黑名单之类的逻辑。</li>
+        <li>目前风险偏高，其实也就是 4.2–4.8 评级为 B 的 4 笔订单，但是<strong>样本较少，不具有统计意义</strong>。</li>
+      </ol>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ====== PART 6：后续建议 ====== -->
   <div class="section">
     <div class="section-header">
       <div class="section-badge bg-purple">★</div>
